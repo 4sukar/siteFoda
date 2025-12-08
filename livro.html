@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="estilo.css" />
+    <title>Detalhes do Livro</title>
+
+    <style>
+        .stars { color: gold; font-size: 1.3rem; }
+        .tags span {
+            background: #333; padding: 5px 10px; border-radius: 5px;
+            margin-right: 6px; font-size: 0.9rem;
+        }
+        .selo {
+            display: inline-block; background: #6a00ff; padding: 6px 12px;
+            border-radius: 6px; margin-bottom: 10px; font-weight: bold;
+        }
+        .estoque { margin: 10px 0; font-weight: bold; }
+        .comments {
+            margin-top: 2em; background: #1a1a1a;
+            padding: 1em; border-radius: 10px;
+        }
+        .comment { border-bottom: 1px solid #333; padding: 10px 0; }
+
+        .book-img {
+            width: 260px;
+            height: auto;
+            border-radius: 10px;
+            object-fit: contain;
+        }
+
+        .carousel { margin-top: 2em; }
+        .carousel-container {
+            display: flex; gap: 1em; overflow-x: auto; padding-bottom: 10px;
+        }
+        .carousel-item {
+            min-width: 160px; background: #111;
+            padding: 10px; border-radius: 8px; text-align: center;
+        }
+        .carousel-item img {
+            width: 100%; height: 180px; object-fit: cover; border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <ul class="navigation">
+            <li><a href="index.html">Voltar</a></li>
+        </ul>
+    </header>
+
+    <div id="content" class="book-page"></div>
+
+    <script>
+
+        // DADOS DOS LIVROS
+        const livros = {
+            domquixote: {
+                title: "Dom Quixote",
+                img: "img/dom_quixote.png",
+                price: "99.90",
+                desc: "Dom Quixote, escrito por Miguel de Cervantes...",
+                sold: 50321,
+                tags: ["Clássico", "Aventura", "Literatura Mundial"]
+            },
+            hp1: {
+                title: "Harry Potter e a Pedra Filosofal",
+                img: "img/harry3.jpeg",
+                price: "59.90",
+                desc: "Harry Potter e a Pedra Filosofal, de J.K. Rowling...",
+                sold: 30892,
+                tags: ["Fantasia", "Magia", "Juvenil"]
+            },
+            dorian: {
+                title: "O Retrato de Dorian Gray",
+                img: "img/doriangray7.jpg",
+                price: "49.90",
+                desc: "O Retrato de Dorian Gray, de Oscar Wilde...",
+                sold: 22140,
+                tags: ["Clássico", "Drama", "Reflexivo"]
+            }
+        };
+
+        const params = new URLSearchParams(location.search);
+        const bookID = params.get("book");
+        const livro = livros[bookID];
+
+        // ESTOQUE ALEATÓRIO
+        const estoque = Math.floor(Math.random() * 10) + 1;
+        let estoqueTexto =
+            estoque > 5 ? "🟢 Em estoque" :
+            estoque > 2 ? "⚠️ Poucas unidades restantes!" :
+            "🔴 Últimas unidades!";
+
+        // ESTRELAS
+        const media = (Math.random() * 2 + 3).toFixed(1);
+        const estrelas = "⭐".repeat(Math.round(media));
+
+        // COMENTÁRIOS FALSOS
+        const nomesFake = ["Lucas Almeida", "Mariana Santos", "João Vitor", "Ana Paula", "Carlos Henrique"];
+        const comentariosFake = [
+            "Livro incrível, super recomendo!",
+            "A história me prendeu do início ao fim.",
+            "Muito bem escrito, vale demais!",
+            "Entrega rápida e qualidade excelente.",
+            "Me surpreendeu bastante!"
+        ];
+
+        let comentariosHTML = "";
+        for (let i = 0; i < 3; i++) {
+            const nome = nomesFake[Math.floor(Math.random() * nomesFake.length)];
+            const texto = comentariosFake[Math.floor(Math.random() * comentariosFake.length)];
+            const nota = "⭐".repeat(Math.floor(Math.random() * 2) + 4);
+
+            comentariosHTML += `
+                <div class="comment">
+                    <p><strong>${nome}</strong></p>
+                    <p class="stars">${nota}</p>
+                    <p>${texto}</p>
+                </div>
+            `;
+        }
+
+        // CARROSSEL DE RECOMENDADOS
+        let recomendadosHTML = "";
+        Object.keys(livros).forEach(id => {
+            if (id !== bookID) {
+                const l = livros[id];
+                recomendadosHTML += `
+                    <div class="carousel-item">
+                        <img src="${l.img}">
+                        <p><strong>${l.title}</strong></p>
+                        <p>R$ ${l.price}</p>
+                    </div>
+                `;
+            }
+        });
+
+        document.getElementById("content").innerHTML = `
+            <img src="${livro.img}" class="book-img">
+
+            <div class="book-info">
+                <span class="selo">📚 Mais vendido da categoria</span>
+
+                <h2>${livro.title}</h2>
+
+                <p class="stars">${estrelas} (${media})</p>
+
+                <p>${livro.desc}</p>
+                <p><strong>${livro.sold.toLocaleString()}</strong> compras</p>
+
+                <div class="estoque">${estoqueTexto}</div>
+
+                <p class="price">R$ ${livro.price}</p>
+
+                <div class="tags">
+                    ${livro.tags.map(t => `<span>${t}</span>`).join("")}
+                </div>
+
+                <a href="compra.html?book=${bookID}">
+                    <button class="buy-btn">Comprar Agora</button>
+                </a>
+
+                <div class="comments">
+                    <h3>Avaliações dos leitores</h3>
+                    ${comentariosHTML}
+                </div>
+
+                <div class="carousel">
+                    <h3>Clientes também compraram</h3>
+                    <div class="carousel-container">
+                        ${recomendadosHTML}
+                    </div>
+                </div>
+            </div>
+        `;
+    </script>
+</body>
+</html>

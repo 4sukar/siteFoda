@@ -1,0 +1,197 @@
+/* -------------------------------------- */
+/*   TEMA DARK MODERNO - ESTILO AMAZON    */
+/* -------------------------------------- */
+
+body {
+    background-color: #0e0e0e;
+    color: #ffffff;
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+}
+
+/* HEADER */
+header {
+    background: #111;
+    padding: 1.2em;
+    position: sticky;
+    top: 0;
+    z-index: 10000;
+}
+
+.navigation {
+    display: flex;
+    justify-content: center;
+    gap: 2em;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navigation a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
+.navigation a:hover {
+    color: #bbbbbb;
+}
+
+/* LISTA DE LIVROS */
+.catalogo-container {
+    padding: 2em;
+    margin-top: 1em;
+}
+
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2em;
+}
+
+.card {
+    background-color: #1a1a1a;
+    padding: 1em;
+    border-radius: 10px;
+    width: 250px;
+    text-align: center;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.card:hover {
+    scale: 1.04;
+    background: #222;
+}
+
+.card img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 0.5em;
+}
+
+/* PÁGINA DO LIVRO */
+.book-page {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.book-img {
+    width: 280px;
+    height: auto;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+.book-info {
+    max-width: 600px;
+    min-width: 300px;
+}
+
+.price {
+    color: #bb86fc;
+    font-size: 1.7rem;
+    margin: 0.2em 0 0.7em;
+}
+
+.buy-btn {
+    background: #6a00ff;
+    padding: 12px 22px;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
+.buy-btn:hover {
+    background: #4b00cc;
+}
+
+/* CHECKOUT */
+.checkout {
+    margin: auto;
+    margin-top: 2em;
+    background: #1a1a1a;
+    padding: 2em;
+    max-width: 500px;
+    border-radius: 10px;
+}
+
+.checkout input {
+    width: 100%;
+    padding: 10px;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 6px;
+    color: white;
+}
+
+.checkout button {
+    margin-top: 1em;
+    width: 100%;
+    padding: 12px;
+    background: #6a00ff;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.checkout button:hover {
+    background: #5100c9;
+}
+
+/* COMENTÁRIOS */
+.comment {
+    border-bottom: 1px solid #333;
+    padding: 10px 0;
+}
+
+/* CARROSSEL */
+.carousel-container {
+    display: flex;
+    gap: 1em;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.carousel-item {
+    min-width: 160px;
+    background: #111;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.carousel-item img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 1em;
+    background-color: #111;
+    margin-top: 3em;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 700px) {
+    .book-img {
+        width: 70%;
+        margin-bottom: 1rem;
+    }
+}
