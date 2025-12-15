@@ -1,118 +1,149 @@
-// ===== MODAL DE DETALHES DO LIVRO =====
-const modalDetails = document.getElementById("book-details-modal");
-const modalPurchase = document.getElementById("purchase-modal");
-
-const detailsImg = document.getElementById("details-img");
-const detailsTitle = document.getElementById("details-title");
-const detailsDesc = document.getElementById("details-desc");
-const detailsPrice = document.getElementById("details-price");
-
-const closeDetails = document.getElementById("closeDetails");
-const closePurchase = document.getElementById("closePurchase");
-
-let livroSelecionado = null;
-
-// Abrir modal ao clicar no livro
-const livros = document.querySelectorAll(".livro");
-
-livros.forEach(livro => {
-    livro.addEventListener("click", () => {
-        const title = livro.dataset.title;
-        const price = livro.dataset.price;
-        const img = livro.dataset.img;
-        const desc = livro.dataset.desc;
-
-        livroSelecionado = { title, price };
-
-        detailsImg.src = img;
-        detailsTitle.textContent = title;
-        detailsDesc.textContent = desc;
-        detailsPrice.textContent = `R$ ${price}`;
-
-        modalDetails.classList.remove("hidden");
-    });
-});
-
-// Fechar modal
-closeDetails.onclick = () => modalDetails.classList.add("hidden");
-
-// Quando clicar em comprar → abre modal compra
-document.getElementById("buyBtn").onclick = () => {
-    modalDetails.classList.add("hidden");
-    modalPurchase.classList.remove("hidden");
+// DADOS DOS LIVROS
+const livros = {
+    domquixote: {
+        title: "Dom Quixote",
+        img: "img/dom_quixote.png",
+        price: "99.90",
+        desc: "Dom Quixote, escrito por Miguel de Cervantes...",
+        sold: 50321,
+        tags: ["Clássico", "Aventura", "Literatura Mundial"]
+    },
+    hp1: {
+        title: "Harry Potter e a Pedra Filosofal",
+        img: "img/harry3.jpeg",
+        price: "59.90",
+        desc: "Harry Potter e a Pedra Filosofal, de J.K. Rowling...",
+        sold: 30892,
+        tags: ["Fantasia", "Magia", "Juvenil"]
+    },
+    dorian: {
+        title: "O Retrato de Dorian Gray",
+        img: "img/doriangray7.jpg",
+        price: "49.90",
+        desc: "O Retrato de Dorian Gray, de Oscar Wilde...",
+        sold: 22140,
+        tags: ["Clássico", "Drama", "Reflexivo"]
+    }
 };
 
+const params = new URLSearchParams(location.search);
+const bookID = params.get("book");
+const livro = livros[bookID];
 
-// ========= API 1 — CEP =========
-document.getElementById("cepSearch").addEventListener("click", async () => {
-    const cep = document.getElementById("cepInput").value;
-    const cepResult = document.getElementById("cepResult");
+// ESTOQUE ALEATÓRIO
+const estoque = Math.floor(Math.random() * 10) + 1;
+let estoqueTexto =
+    estoque > 5 ? "🟢 Em estoque" :
+    estoque > 2 ? "⚠️ Poucas unidades restantes!" :
+    "🔴 Últimas unidades!";
+
+// ESTRELAS
+const media = (Math.random() * 2 + 3).toFixed(1);
+const estrelas = "⭐".repeat(Math.round(media));
+
+// CARROSSEL DE RECOMENDADOS
+let recomendadosHTML = "";
+Object.keys(livros).forEach(id => {
+    if (id !== bookID) {
+        const l = livros[id];
+        recomendadosHTML += `
+            <div class="carousel-item">
+                <img src="${l.img}">
+                <p><strong>${l.title}</strong></p>
+                <p>R$ ${l.price}</p>
+            </div>
+        `;
+    }
+});
+
+// Função para aplicar cupom de desconto
+async function aplicarCupom() {
+    const cupom = document.getElementById("couponInput").value;
 
     try {
-        const response = await fetch(`https://brasilapi.com.br/api/cep/v2/${cep}`);
-
-        if (!response.ok) throw new Error("CEP não encontrado.");
-
+        const response = await fetch(`https://api.discountapi.com/v1/coupons/${cupom}`);
         const data = await response.json();
 
-        const frete = (Math.random() * 20 + 5).toFixed(2);
-
-        cepResult.innerHTML = `
-      Endereço: ${data.street}, ${data.city} - ${data.state}<br>
-      Frete estimado: R$ ${frete}
-    `;
+        if (data.valid) {
+            const desconto = data.discount;
+            const novoPreco = (livro.price - desconto).toFixed(2);
+            document.getElementById("precoComDesconto").textContent = `Preço com desconto: R$ ${novoPreco}`;
+        } else {
+            alert("Cupom inválido.");
+        }
     } catch (erro) {
-        cepResult.textContent = "Erro ao buscar CEP.";
+        alert("Erro ao aplicar cupom.");
     }
-});
+}
 
+// Função para carregar avaliações reais (Trustpilot API exemplo)
+async function carregarAvaliacoes() {
+    const livroId = livro.title; // Você pode usar um ID real
+    const response = await fetch(`https://api.trustpilot.com/v1/business-units/${livroId}/reviews`, {
+        headers: {
+            "Authorization": "Bearer SUA_CHAVE_DE_API_AQUI" // Substitua pela sua chave da API
+        }
+    });
+    
+    const data = await response.json();
+    
+    let comentariosHTML = "";
+    data.reviews.forEach((avaliacao) => {
+        comentariosHTML += `
+            <div class="comment">
+                <p><strong>${avaliacao.reviewer.name}</strong></p>
+                <p class="stars">${"⭐".repeat(avaliacao.rating)}</p>
+                <p>${avaliacao.text}</p>
+            </div>
+        `;
+    });
 
-// ========= API 2 — TAXAS =========
-document.getElementById("taxBtn").addEventListener("click", async () => {
-    const taxResult = document.getElementById("taxResult");
+    document.querySelector(".comments").innerHTML = comentariosHTML;
+}
 
-    try {
-        const response = await fetch("https://brasilapi.com.br/api/taxas/v1");
-        const data = await response.json();
+// Chama a função para carregar as avaliações ao carregar a página
+carregarAvaliacoes();
 
-        const taxa = data[0]; // primeira taxa
+document.getElementById("content").innerHTML = `
+    <img src="${livro.img}" class="book-img">
 
-        taxResult.innerHTML = `
-      Taxa aplicada (${taxa.nome}): ${taxa.valor}%
-    `;
-    } catch {
-        taxResult.textContent = "Erro ao carregar taxas.";
-    }
-});
+    <div class="book-info">
+        <span class="selo">📚 Mais vendido da categoria</span>
 
+        <h2>${livro.title}</h2>
 
-// ========= API 3 — PAGAMENTO FAKE =========
-document.getElementById("payBtn").addEventListener("click", async () => {
-    const payResult = document.getElementById("payResult");
+        <p class="stars">${estrelas} (${media})</p>
 
-    try {
-        const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
-            method: "POST",
-            body: JSON.stringify({
-                livro: livroSelecionado.title,
-                preco: livroSelecionado.price,
-            }),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
+        <p>${livro.desc}</p>
+        <p><strong>${livro.sold.toLocaleString()}</strong> compras</p>
 
-        const data = await response.json();
+        <div class="estoque">${estoqueTexto}</div>
 
-        payResult.innerHTML = `
-      Pagamento confirmado!<br>
-      ID da transação PIX: <strong>${data.id}</strong>
-    `;
-    } catch {
-        payResult.textContent = "Erro ao realizar pagamento.";
-    }
-});
+        <p class="price">R$ ${livro.price}</p>
 
+        <div class="tags">
+            ${livro.tags.map(t => `<span>${t}</span>`).join("")}
+        </div>
 
-// Fechar modal de compra
-closePurchase.onclick = () => modalPurchase.classList.add("hidden");
+        <div class="cupom">
+            <input type="text" id="couponInput" placeholder="Digite seu cupom de desconto">
+            <button onclick="aplicarCupom()">Aplicar</button>
+            <p id="precoComDesconto"></p>
+        </div>
+
+        <a href="compra.html?book=${bookID}">
+            <button class="buy-btn">Comprar Agora</button>
+        </a>
+
+        <div class="comments">
+            <h3>Avaliações dos leitores</h3>
+            <!-- Avaliações reais serão carregadas aqui -->
+        </div>
+
+        <div class="carousel">
+            <h3>Clientes também compraram</h3>
+            <div class="carousel-container">
+                ${recomendadosHTML}
+            </div>
+        </div>
+    </div>
